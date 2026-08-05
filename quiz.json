@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "landmarks": [
     {
       "id": "gyeongbokgung",
@@ -13,7 +13,7 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "경복궁을 창건한 왕은 누구일까요?",
-          "options": ["태조 이성계", "세종대왕", "정조", "광해군"],
+          "options": ["태조 이성계", "세종대왕", "광해군", "정조"],
           "answer": 0,
           "explanation": "1395년 태조 이성계가 조선을 세우고 경복궁을 창건했어요."
         },
@@ -22,8 +22,8 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "경복궁의 남쪽 정문 이름은 무엇일까요?",
-          "options": ["광화문", "숭례문", "흥인지문", "돈의문"],
-          "answer": 0,
+          "options": ["돈의문", "광화문", "흥인지문", "숭례문"],
+          "answer": 1,
           "explanation": "경복궁의 남쪽 정문은 광화문입니다."
         },
         {
@@ -31,8 +31,8 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "왕이 나랏일을 보던 경복궁의 중심 건물은?",
-          "options": ["근정전", "경회루", "향원정", "교태전"],
-          "answer": 0,
+          "options": ["향원정", "교태전", "경회루", "근정전"],
+          "answer": 3,
           "explanation": "근정전은 왕의 즉위식과 공식 행사가 열리던 정전이에요."
         }
       ]
@@ -49,8 +49,8 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "불국사가 있는 도시는 어디일까요?",
-          "options": ["경주", "부여", "공주", "서울"],
-          "answer": 0,
+          "options": ["서울", "경주", "부여", "공주"],
+          "answer": 1,
           "explanation": "불국사는 경상북도 경주시에 있어요."
         },
         {
@@ -58,8 +58,8 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "불국사 앞에 있는 유명한 두 탑은 다보탑과 무엇일까요?",
-          "options": ["석가탑", "미륵탑", "월정탑", "감은탑"],
-          "answer": 0,
+          "options": ["미륵탑", "월정탑", "석가탑", "감은탑"],
+          "answer": 2,
           "explanation": "다보탑과 석가탑이 나란히 서 있어요."
         },
         {
@@ -67,8 +67,8 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "불국사는 어느 나라 때 지어졌을까요?",
-          "options": ["신라", "고구려", "백제", "고려"],
-          "answer": 0,
+          "options": ["고려", "고구려", "백제", "신라"],
+          "answer": 3,
           "explanation": "통일신라 시대에 지어진 절이에요."
         }
       ]
@@ -85,8 +85,8 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "선릉은 어느 시대 왕의 무덤일까요?",
-          "options": ["조선", "신라", "고구려", "고려"],
-          "answer": 0,
+          "options": ["고구려", "조선", "신라", "고려"],
+          "answer": 1,
           "explanation": "선릉은 조선 제9대 임금 성종과 왕비의 무덤이에요."
         },
         {
@@ -103,7 +103,7 @@
           "ageGroup": "CHILD",
           "difficulty": "EASY",
           "text": "선릉은 서울 어느 구에 있을까요?",
-          "options": ["강남구", "종로구", "마포구", "송파구"],
+          "options": ["강남구", "종로구", "송파구", "마포구"],
           "answer": 0,
           "explanation": "선릉은 서울 강남구에 있는 조선 왕릉으로, 유네스코 세계문화유산이에요."
         },
@@ -112,8 +112,8 @@
           "ageGroup": "CHILD",
           "difficulty": "MEDIUM",
           "text": "선릉의 주인공인 성종 임금 때 완성된 조선의 기본 법전은 무엇일까요?",
-          "options": ["경국대전", "대전회통", "속대전", "삼국사기"],
-          "answer": 0,
+          "options": ["속대전", "대전회통", "삼국사기", "경국대전"],
+          "answer": 3,
           "explanation": "성종은 세조 때부터 편찬해 온 조선의 기본 법전 '경국대전'을 완성해 나라의 통치 질서를 세웠어요."
         },
         {
@@ -121,8 +121,8 @@
           "ageGroup": "CHILD",
           "difficulty": "MEDIUM",
           "text": "선릉과 정릉을 함께 묶어 부르는 이름은 무엇일까요?",
-          "options": ["선정릉", "동구릉", "서오릉", "홍유릉"],
-          "answer": 0,
+          "options": ["홍유릉", "서오릉", "선정릉", "동구릉"],
+          "answer": 2,
           "explanation": "성종의 무덤인 선릉과 중종의 무덤인 정릉이 한 곳에 모여 있어 '선정릉'이라고 불러요."
         },
         {
@@ -130,8 +130,8 @@
           "ageGroup": "CHILD",
           "difficulty": "MEDIUM",
           "text": "선릉이 속한 '조선왕릉'은 2009년 유네스코 세계문화유산에 등재되었어요. 모두 몇 기가 등재되었을까요?",
-          "options": ["40기", "12기", "25기", "100기"],
-          "answer": 0,
+          "options": ["12기", "25기", "40기", "100기"],
+          "answer": 2,
           "explanation": "2009년 조선의 왕과 왕비의 무덤 40기가 '조선왕릉'이라는 이름으로 유네스코 세계문화유산에 등재되었어요."
         }
       ]
