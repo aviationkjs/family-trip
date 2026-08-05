@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "landmarks": [
     {
       "id": "gyeongbokgung",
@@ -11,6 +11,7 @@
         {
           "id": "gbg-q1",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "경복궁을 창건한 왕은 누구일까요?",
           "options": ["태조 이성계", "세종대왕", "정조", "광해군"],
           "answer": 0,
@@ -19,6 +20,7 @@
         {
           "id": "gbg-q2",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "경복궁의 남쪽 정문 이름은 무엇일까요?",
           "options": ["광화문", "숭례문", "흥인지문", "돈의문"],
           "answer": 0,
@@ -27,6 +29,7 @@
         {
           "id": "gbg-q3",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "왕이 나랏일을 보던 경복궁의 중심 건물은?",
           "options": ["근정전", "경회루", "향원정", "교태전"],
           "answer": 0,
@@ -44,6 +47,7 @@
         {
           "id": "bgs-q1",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "불국사가 있는 도시는 어디일까요?",
           "options": ["경주", "부여", "공주", "서울"],
           "answer": 0,
@@ -52,6 +56,7 @@
         {
           "id": "bgs-q2",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "불국사 앞에 있는 유명한 두 탑은 다보탑과 무엇일까요?",
           "options": ["석가탑", "미륵탑", "월정탑", "감은탑"],
           "answer": 0,
@@ -60,6 +65,7 @@
         {
           "id": "bgs-q3",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "불국사는 어느 나라 때 지어졌을까요?",
           "options": ["신라", "고구려", "백제", "고려"],
           "answer": 0,
@@ -77,6 +83,7 @@
         {
           "id": "slg-q1",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "선릉은 어느 시대 왕의 무덤일까요?",
           "options": ["조선", "신라", "고구려", "고려"],
           "answer": 0,
@@ -85,6 +92,7 @@
         {
           "id": "slg-q2",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "선릉에 잠든 조선의 임금은 누구일까요?",
           "options": ["성종", "세종대왕", "태조 이성계", "정조"],
           "answer": 0,
@@ -93,6 +101,7 @@
         {
           "id": "slg-q3",
           "ageGroup": "CHILD",
+          "difficulty": "EASY",
           "text": "선릉은 서울 어느 구에 있을까요?",
           "options": ["강남구", "종로구", "마포구", "송파구"],
           "answer": 0,
