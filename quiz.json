@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "landmarks": [
     {
       "id": "gyeongbokgung",
@@ -64,6 +64,39 @@
           "options": ["신라", "고구려", "백제", "고려"],
           "answer": 0,
           "explanation": "통일신라 시대에 지어진 절이에요."
+        }
+      ]
+    },
+    {
+      "id": "seolleung",
+      "name": "선릉",
+      "lat": 37.5089,
+      "lng": 127.0490,
+      "radius": 100,
+      "questions": [
+        {
+          "id": "slg-q1",
+          "ageGroup": "CHILD",
+          "text": "선릉은 어느 시대 왕의 무덤일까요?",
+          "options": ["조선", "신라", "고구려", "고려"],
+          "answer": 0,
+          "explanation": "선릉은 조선 제9대 임금 성종과 왕비의 무덤이에요."
+        },
+        {
+          "id": "slg-q2",
+          "ageGroup": "CHILD",
+          "text": "선릉에 잠든 조선의 임금은 누구일까요?",
+          "options": ["성종", "세종대왕", "태조 이성계", "정조"],
+          "answer": 0,
+          "explanation": "선릉에는 조선 제9대 임금 성종이 잠들어 있어요."
+        },
+        {
+          "id": "slg-q3",
+          "ageGroup": "CHILD",
+          "text": "선릉은 서울 어느 구에 있을까요?",
+          "options": ["강남구", "종로구", "마포구", "송파구"],
+          "answer": 0,
+          "explanation": "선릉은 서울 강남구에 있는 조선 왕릉으로, 유네스코 세계문화유산이에요."
         }
       ]
     }
