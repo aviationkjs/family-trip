@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "landmarks": [
+    {
+      "id": "gyeongbokgung",
+      "name": "경복궁",
+      "lat": 37.5796,
+      "lng": 126.9770,
+      "radius": 100,
+      "questions": [
+        {
+          "id": "gbg-q1",
+          "ageGroup": "CHILD",
+          "text": "경복궁을 창건한 왕은 누구일까요?",
+          "options": ["태조 이성계", "세종대왕", "정조", "광해군"],
+          "answer": 0,
+          "explanation": "1395년 태조 이성계가 조선을 세우고 경복궁을 창건했어요."
+        },
+        {
+          "id": "gbg-q2",
+          "ageGroup": "CHILD",
+          "text": "경복궁의 남쪽 정문 이름은 무엇일까요?",
+          "options": ["광화문", "숭례문", "흥인지문", "돈의문"],
+          "answer": 0,
+          "explanation": "경복궁의 남쪽 정문은 광화문입니다."
+        },
+        {
+          "id": "gbg-q3",
+          "ageGroup": "CHILD",
+          "text": "왕이 나랏일을 보던 경복궁의 중심 건물은?",
+          "options": ["근정전", "경회루", "향원정", "교태전"],
+          "answer": 0,
+          "explanation": "근정전은 왕의 즉위식과 공식 행사가 열리던 정전이에요."
+        }
+      ]
+    },
+    {
+      "id": "bulguksa",
+      "name": "불국사",
+      "lat": 35.7900,
+      "lng": 129.3320,
+      "radius": 100,
+      "questions": [
+        {
+          "id": "bgs-q1",
+          "ageGroup": "CHILD",
+          "text": "불국사가 있는 도시는 어디일까요?",
+          "options": ["경주", "부여", "공주", "서울"],
+          "answer": 0,
+          "explanation": "불국사는 경상북도 경주시에 있어요."
+        },
+        {
+          "id": "bgs-q2",
+          "ageGroup": "CHILD",
+          "text": "불국사 앞에 있는 유명한 두 탑은 다보탑과 무엇일까요?",
+          "options": ["석가탑", "미륵탑", "월정탑", "감은탑"],
+          "answer": 0,
+          "explanation": "다보탑과 석가탑이 나란히 서 있어요."
+        },
+        {
+          "id": "bgs-q3",
+          "ageGroup": "CHILD",
+          "text": "불국사는 어느 나라 때 지어졌을까요?",
+          "options": ["신라", "고구려", "백제", "고려"],
+          "answer": 0,
+          "explanation": "통일신라 시대에 지어진 절이에요."
+        }
+      ]
+    }
+  ]
+}
