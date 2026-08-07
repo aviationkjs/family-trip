@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "landmarks": [
     {
       "id": "gyeongbokgung",
@@ -76,9 +76,9 @@
     {
       "id": "seolleung",
       "name": "선릉",
-      "lat": 37.5089,
-      "lng": 127.0490,
-      "radius": 100,
+      "lat": 37.5068,
+      "lng": 127.0525,
+      "radius": 500,
       "questions": [
         {
           "id": "slg-q1",
