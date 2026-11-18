@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>야식 도둑 마피아 · 실시간</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+:root{
+  /* 배치: 위 상태줄(방·나·단계·남은 시간) / 아래로 단계 카드. 새벽 부엌 느낌의 단일 어두운 테마 */
+  --night:#121829;
+  --card:#1d2540;
+  --line:#34416a;
+  --amber:#ffb547;
+  --mint:#7fe0c0;
+  --red:#ff6b6b;
+  --sky:#5cc8ff;
+  --text:#eef1f8;
+  --muted:#a2abc4;
+  --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--night);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding:0 16px 48px;-webkit-tap-highlight-color:transparent;word-break:keep-all;overflow-wrap:anywhere}
+main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-top:12px}
+h1{font-family:var(--display);font-weight:400;font-size:30px;margin:8px 0 0;text-wrap:balance}
+h1 span{color:var(--amber)}
+h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0;text-wrap:balance}
+h3{font-family:var(--display);font-weight:400;font-size:17px;margin:4px 0 0;color:var(--amber)}
+p{margin:0}
+.sub{color:var(--muted);font-size:14px}
+.center{text-align:center}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+button,input{font:inherit;color:inherit}
+.btn{border:1.5px solid var(--line);background:transparent;border-radius:10px;padding:10px 14px;min-height:46px;cursor:pointer}
+.btn:focus-visible,input:focus-visible,.hold:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.btn.main{background:var(--amber);border-color:var(--amber);color:var(--night);font-family:var(--display);font-size:18px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:var(--night)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grid .btn{font-family:var(--display);font-size:20px;min-height:58px;padding:4px}
+.grid .btn small{display:block;font-family:var(--body);font-size:11.5px;line-height:1.2}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row .grow{flex:1}
+[hidden]{display:none!important}
+input.code,input.text{width:100%;background:var(--night);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px}
+input.code{font-family:var(--display);font-size:30px;letter-spacing:.3em;text-align:center}
+input.text{font-size:18px}
+.warn{background:color-mix(in srgb,var(--red) 18%,var(--card));border:1.5px solid var(--red);border-radius:10px;padding:8px 12px}
+
+.status{position:sticky;top:0;z-index:3;background:var(--night);margin:0 -16px;padding:10px 16px 8px;border-bottom:1px solid var(--line)}
+.status .in{max-width:520px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13.5px;color:var(--muted)}
+.chip{border:1.5px solid var(--line);border-radius:99px;padding:1px 10px;white-space:nowrap}
+.chip b{font-family:var(--display);font-weight:400;color:var(--text)}
+.chip.phase{border-color:var(--amber)} .chip.phase b{color:var(--amber)}
+.time{margin-left:auto;font-family:var(--display);font-size:20px;color:var(--text);font-variant-numeric:tabular-nums}
+.time.low{color:var(--red)}
+
+.share{display:flex;gap:14px;align-items:center}
+.qr{background:#fff;padding:8px;border-radius:10px;flex:none;width:148px;height:148px}
+.qr img,.qr canvas{display:block;width:132px!important;height:132px!important}
+.link{font-size:13px;color:var(--muted);margin:4px 0 8px}
+
+.hold{position:relative;min-height:124px;border-radius:12px;border:2px dashed var(--line);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:4px;padding:12px;cursor:pointer;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.hold .cover{font-family:var(--display);font-size:18px;color:var(--muted)}
+.hold .reveal{display:none}
+.hold.show{border-style:solid}
+.hold.show .cover{display:none}
+.hold.show .reveal{display:block}
+.hold.show.thief{border-color:var(--red);background:color-mix(in srgb,var(--red) 14%,var(--card))}
+.hold.show.town{border-color:var(--mint);background:color-mix(in srgb,var(--mint) 12%,var(--card))}
+.role{font-family:var(--display);font-size:30px}
+.thief .role{color:var(--red)} .town .role{color:var(--mint)}
+.mission{font-size:14.5px;max-width:36ch;margin:4px auto 0}
+
+.big{font-family:var(--display);font-size:23px;line-height:1.35;text-wrap:balance}
+.hl{color:var(--amber)}
+.say{border-left:4px solid var(--amber);padding:4px 0 4px 12px;font-size:16.5px}
+.out{color:var(--red)} .ok{color:var(--mint)}
+.done{color:var(--mint);font-size:15px}
+.list{margin:0;padding-left:20px}
+.list li{margin-bottom:4px}
+.seatline{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding:6px 0;font-size:15px}
+.seatline:last-child{border-bottom:0}
+.seatline .dead{text-decoration:line-through;color:var(--muted)}
+.tag{font-family:var(--display);font-size:13px;border-radius:99px;padding:0 8px;border:1.5px solid currentColor;white-space:nowrap}
+.tag.t{color:var(--red)} .tag.d{color:var(--sky)} .tag.s{color:var(--amber)} .tag.c{color:var(--mint)}
+.timer{font-family:var(--display);font-size:64px;text-align:center;font-variant-numeric:tabular-nums;line-height:1;margin:6px 0}
+.timer.low{color:var(--red)}
+.winner{font-family:var(--display);font-size:30px;text-align:center}
+.winner.t{color:var(--red)} .winner.c{color:var(--mint)}
+.spect{border-color:var(--muted)}
+.foot{text-align:center}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:6px;font-size:13.5px}
+.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:var(--amber);color:var(--night);font-family:var(--display);
+  padding:8px 16px;border-radius:99px;z-index:9;font-size:16px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="status" id="status" hidden>
+  <div class="in">
+    <span class="chip">방 <b id="sCode"></b></span>
+    <span class="chip"><b id="sMe"></b></span>
+    <span class="chip phase"><b id="sPhase"></b></span>
+    <span class="time" id="sTime" hidden></span>
+  </div>
+</header>
+<main id="app"><p class="sub" style="padding-top:40px;text-align:center">불러오는 중…</p></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="core.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
