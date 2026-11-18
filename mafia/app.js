@@ -23,6 +23,7 @@ const app = $("app");
 
 let D = null, uid = null, code = null, offset = 0;
 let S = {}; // 구독한 데이터: meta, players, public, votes, me(secret), my(private), secretAll, actions, privateAll
+let presenceRef = null;
 let subs = {}, lastStatusKey = "", refTimer = 0, busy = false, voice = false;
 
 // ---------- 공통 ----------
@@ -110,6 +111,7 @@ async function joinRoom(c, name) {
 
 // ---------- 방 구독 ----------
 function cleanup() {
+  if (presenceRef) { try { onDisconnect(presenceRef).cancel(); } catch (e) {} presenceRef = null; } // 닫힌 방에 빈 기록이 다시 생기지 않게
   Object.values(subs).forEach((f) => { try { f(); } catch (e) {} });
   subs = {}; S = {}; code = null; lastStatusKey = "";
   clearInterval(refTimer); refTimer = 0;
@@ -123,6 +125,7 @@ function enterRoom(c) {
   cleanup();
   code = c; save("mafiaRoom", c);
   const presence = ref(db, roomPath("players/" + uid + "/online"));
+  presenceRef = presence;
   subs.conn = onValue(ref(db, ".info/connected"), (s) => {
     if (s.val() === true) { onDisconnect(presence).set(false); set(presence, true).catch(() => {}); }
   });
