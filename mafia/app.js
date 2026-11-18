@@ -341,7 +341,7 @@ function voteTable(d) {
 function verdictView() {
   const d = S.meta.day, rec = (((S.pub.days || {})[d]) || {}).vote || {};
   let h = '<section class="card"><h2>' + d + "일째 투표 결과</h2>";
-  if (rec.exiled) h += '<p class="big"><span class="hl">' + label(rec.exiled) + '</span> 추방!</p><p class="big">역할은 <span class="' + (rec.role === "thief" ? "out" : "ok") + '">' + C.RNAME[rec.role] + "</span>였어요.</p>";
+  if (rec.exiled) h += '<p class="big"><span class="hl">' + label(rec.exiled) + '</span> 추방!</p><p class="big">역할은 <span class="' + (rec.role === "thief" ? "out" : "ok") + '">' + C.RNAME[rec.role] + "</span>" + (batchim(C.RNAME[rec.role]) ? "이었어요." : "였어요.") + "</p>";
   else h += '<p class="big">' + (rec.tie ? "또 동점! 이번엔 추방 없이 넘어가요." : "아무도 추방되지 않았어요.") + "</p>";
   h += voteTable(d) + (P(uid).alive ? readyBtn("확인했어요") : "") + "</section>";
   return h + logCard();
