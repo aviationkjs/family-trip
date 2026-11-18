@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>야식 도둑 마피아</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+:root{
+  /* 배치: 위 상태줄(방·자리·단계·암호) / 가운데 단계 카드 / 아래 고정 버튼. 새벽 부엌 느낌의 단일 어두운 테마 */
+  --night:#121829;
+  --card:#1d2540;
+  --line:#34416a;
+  --amber:#ffb547;
+  --mint:#7fe0c0;
+  --red:#ff6b6b;
+  --text:#eef1f8;
+  --muted:#a2abc4;
+  --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--night);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding:0 16px 120px;-webkit-tap-highlight-color:transparent;word-break:keep-all;overflow-wrap:anywhere}
+main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-top:12px}
+h1{font-family:var(--display);font-weight:400;font-size:30px;margin:8px 0 0;text-wrap:balance}
+h1 span{color:var(--amber)}
+h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 8px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:400;font-size:17px;margin:12px 0 6px;color:var(--amber)}
+p{margin:0}
+.sub{color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+button,input{font:inherit;color:inherit}
+.btn{border:1.5px solid var(--line);background:transparent;border-radius:10px;padding:10px 14px;min-height:46px;cursor:pointer}
+.btn:focus-visible,input:focus-visible,.hold:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.btn.main{background:var(--amber);border-color:var(--amber);color:var(--night);font-family:var(--display);font-size:18px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:var(--night)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grid .btn{font-family:var(--display);font-size:20px;min-height:54px;padding:4px}
+.grid .btn small{display:block;font-family:var(--body);font-size:11.5px;line-height:1.2}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row .grow{flex:1}
+[hidden]{display:none!important}
+input.code{width:100%;font-family:var(--display);font-size:30px;letter-spacing:.15em;text-align:center;
+  background:var(--night);border:1.5px solid var(--line);border-radius:10px;padding:6px 0}
+
+/* 상태줄 */
+.status{position:sticky;top:0;z-index:3;background:var(--night);margin:0 -16px;padding:10px 16px 8px;border-bottom:1px solid var(--line)}
+.status .in{max-width:520px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13.5px;color:var(--muted)}
+.chip{border:1.5px solid var(--line);border-radius:99px;padding:1px 10px;white-space:nowrap}
+.chip b{font-family:var(--display);font-weight:400;color:var(--text)}
+.chip.phase{border-color:var(--amber);color:var(--amber)}
+.chip.phase b{color:var(--amber)}
+.status .pw{margin-left:auto}
+
+/* 역할 카드: 누르고 있는 동안만 */
+.hold{position:relative;min-height:124px;border-radius:12px;border:2px dashed var(--line);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:4px;padding:12px;cursor:pointer;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.hold .cover{font-family:var(--display);font-size:18px;color:var(--muted)}
+.hold .reveal{display:none}
+.hold.show{border-style:solid}
+.hold.show .cover{display:none}
+.hold.show .reveal{display:block}
+.hold.show.thief{border-color:var(--red);background:color-mix(in srgb,var(--red) 14%,var(--card))}
+.hold.show.town{border-color:var(--mint);background:color-mix(in srgb,var(--mint) 12%,var(--card))}
+.role{font-family:var(--display);font-size:30px}
+.thief .role{color:var(--red)} .town .role{color:var(--mint)}
+.mission{font-size:14.5px;max-width:36ch;margin:4px auto 0}
+
+/* 공지 */
+.big{font-family:var(--display);font-size:24px;line-height:1.35;text-wrap:balance}
+.big .hl{color:var(--amber)}
+.say{border-left:4px solid var(--amber);padding:4px 0 4px 12px;font-size:16.5px}
+.out{color:var(--red)}
+.list{margin:0;padding-left:20px}
+.list li{margin-bottom:4px}
+.seatline{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding:6px 0;font-size:15px}
+.seatline:last-child{border-bottom:0}
+.seatline .dead{text-decoration:line-through;color:var(--muted)}
+.tag{font-family:var(--display);font-size:14px;border-radius:99px;padding:0 8px;border:1.5px solid currentColor;white-space:nowrap}
+.tag.t{color:var(--red)} .tag.d{color:var(--sky,#5cc8ff)} .tag.s{color:var(--amber)} .tag.c{color:var(--mint)}
+.timer{font-family:var(--display);font-size:64px;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+.timer.low{color:var(--red)}
+.winner{font-family:var(--display);font-size:30px;text-align:center}
+.winner.t{color:var(--red)} .winner.c{color:var(--mint)}
+
+/* 아래 고정 버튼 */
+.dock{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(transparent,var(--night) 30%);padding:18px 16px 16px;z-index:3}
+.dock .in{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.dock .hint{text-align:center;font-size:13px;color:var(--muted)}
+.links{display:flex;justify-content:center;gap:16px}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:6px;font-size:13.5px}
+.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:var(--amber);color:var(--night);font-family:var(--display);
+  padding:8px 16px;border-radius:99px;z-index:9;font-size:16px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="status" id="status" hidden>
+  <div class="in">
+    <span class="chip">방 <b id="sCode"></b></span>
+    <span class="chip">나 <b id="sSeat"></b></span>
+    <span class="chip phase" id="sPhaseChip"><b id="sPhase"></b></span>
+    <span class="chip pw">암호 <b id="sPw"></b></span>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<div class="dock" id="dock" hidden>
+  <div class="in">
+    <button type="button" class="btn main" id="next"></button>
+    <p class="hint" id="nextHint"></p>
+    <div class="links">
+      <button type="button" class="linkbtn" id="undo">한 단계 되돌리기</button>
+      <button type="button" class="linkbtn" id="quit">방 나가기</button>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="fallback">{"version": 1, "places": [{"name": "셰어하우스", "intro": "새벽의 셰어하우스. 공용 냉장고에서 야식이 하나씩 사라진다."}, {"name": "MT 숙소", "intro": "MT 둘째 날 밤. 다들 잔다더니 부엌에서 봉지 소리가 난다."}, {"name": "캠핑장 텐트", "intro": "캠핑장의 밤. 아이스박스 뚜껑이 자꾸 열려 있다."}, {"name": "당직실", "intro": "야간 당직실. 시켜 둔 야식이 하나둘 사라진다."}, {"name": "기숙사", "intro": "기숙사 소등 후. 복도 끝 냉장고가 범행 현장이다."}], "foods": [{"name": "치킨", "amount": "반 마리"}, {"name": "족발", "amount": "작은 거"}, {"name": "떡볶이", "amount": "한 그릇"}, {"name": "라면", "amount": "끓여 둔 거"}, {"name": "피자", "amount": "세 조각"}, {"name": "곱창", "amount": "1인분"}, {"name": "김밥", "amount": "두 줄"}, {"name": "군만두", "amount": "한 접시"}, {"name": "닭강정", "amount": "한 컵"}, {"name": "순대", "amount": "반 접시"}, {"name": "보쌈", "amount": "남은 거"}, {"name": "마라탕", "amount": "한 통"}], "traits": ["야근하고 막 들어온 직장인", "다이어트 중이라는 헬스 마니아", "밤샘 게이머", "요리 담당 집주인", "잠꾸러기", "배달 앱 VIP", "새벽 러닝러", "시험 기간 대학생", "유튜브 편집자", "야식 평론가", "물만 마신다는 사람", "냉장고 정리왕"], "events": [{"id": "blackout", "name": "정전", "text": "첫날 밤 정전! 탐정은 오늘 밤 조사할 수 없다."}, {"id": "misdelivery", "name": "배달 오배송", "text": "배달이 꼬였다. 이번 판 냄새 단서 중 하나는 가짜다."}, {"id": "fridgelock", "name": "냉장고 잠금", "text": "누군가 냉장고에 자물쇠를 걸었다. 하룻밤은 아무것도 사라지지 않는다."}], "eventChance": 0.5, "fakeActions": [{"button": "냉장고 소리 듣기", "result": "웅- 하는 냉장고 소리뿐. 배만 고파졌다."}, {"button": "이불 덮고 자기", "result": "꿈에서 치킨을 먹었다. 아무 일도 없었다."}, {"button": "물 한 잔 마시기", "result": "물맛이 오늘따라 달다. 별일 없었다."}, {"button": "배달 앱 구경하기", "result": "장바구니에 담기만 했다. 아무것도 못 봤다."}], "smell": {"parity": "{who} {p} 번호 자리에 앉아 있다.", "pair": "{who} {a}번과 {b}번 중에 있다.", "notThief": "{a}번에게서는 양념 냄새가 안 난다. {a}번은 도둑이 아니다.", "neighbor": "{who} {a}번 바로 옆자리에 앉아 있다."}}</script>
+<script>
+(function(){
+  "use strict";
+  var D=null; // 상황 데이터 (scenarios.json)
+  var ROLES={4:[1,1,0,2],5:[1,1,1,2],6:[1,1,1,3],7:[2,1,1,3],8:[2,1,1,4]}; // 도둑, 탐정, 냄새쟁이, 시민
+  var RNAME={thief:"야식 도둑",detective:"탐정",smeller:"냄새쟁이",citizen:"시민"};
+  var RTAG={thief:"t",detective:"d",smeller:"s",citizen:"c"};
+  var TALK=60;
+  var $=function(id){return document.getElementById(id);};
+  var app=$("app");
+  var G=null;      // 같은 방 번호면 모든 폰에서 똑같이 계산되는 판 정보
+  var ST=null;     // 이 폰의 진행 상태 (저장됨)
+  var timerId=0;
+
+  // ---------- 난수: 방 번호 + 용도 문자열로 고정 ----------
+  function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+  function rng(key){var seed=hash(G?G.code+"|"+key:key);return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function pick(r,a){return a[Math.floor(r()*a.length)];}
+  function shuffle(r,a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function batchim(w){var c=w.charCodeAt(w.length-1);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28!==0;}
+  function iga(w){return w+(batchim(w)?"이":"가");}
+  function eulreul(w){return w+(batchim(w)?"을":"를");}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+
+  // ---------- 판 만들기 ----------
+  function parseCode(v){var m=/^([4-8])-(\d{4})$/.exec(String(v).trim());return m?{n:+m[1],code:m[1]+"-"+m[2]}:null;}
+  function buildGame(code){
+    var n=+code.charAt(0);G={code:code,n:n};
+    var seats=[];for(var i=1;i<=n;i++)seats.push(i);
+    var order=shuffle(rng("roles"),seats),cnt=ROLES[n],role={},k=0;
+    [["thief",cnt[0]],["detective",cnt[1]],["smeller",cnt[2]],["citizen",cnt[3]]].forEach(function(p){for(var j=0;j<p[1];j++)role[order[k++]]=p[0];});
+    var r=rng("scene"),foods=shuffle(r,D.foods),traits=shuffle(r,D.traits),info={};
+    seats.forEach(function(s,ix){info[s]={food:foods[ix%foods.length],trait:traits[ix%traits.length]};});
+    var place=pick(r,D.places),ev=null;
+    if(r()<D.eventChance)ev=pick(r,D.events);
+    G.role=role;G.info=info;G.place=place;G.event=ev;G.seats=seats;
+    G.thieves=seats.filter(function(s){return role[s]==="thief";});
+    G.lockNight=ev&&ev.id==="fridgelock"?1+Math.floor(r()*2):0;     // 1~2일째 밤 중 하루
+    G.fakeNight=ev&&ev.id==="misdelivery"?1+Math.floor(r()*3):0;    // 1~3일째 밤 중 하루
+    var adj=["바삭한","매콤한","촉촉한","달콤한","쫄깃한","뜨끈한","고소한","짭짤한"];
+    var rp=rng("password");G.pw=pick(rp,adj)+" "+pick(rp,D.foods).name+" "+(10+Math.floor(rp()*90));
+    return G;
+  }
+
+  // 지금까지의 추방 기록으로 판 전체를 다시 계산한다 (모든 폰이 같은 결과)
+  function isThief(s){return G.role[s]==="thief";}
+  function judge(alive){
+    var t=alive.filter(isThief).length,c=alive.length-t;
+    if(t===0)return "town";
+    if(t>=c)return "thief";
+    return "";
+  }
+  function replay(exiles,uptoDay,stage){
+    // stage: "night" = 그 날 밤 직전, "morning" = 그 날 밤 직후, "vote" = 그 날 투표 직후
+    var alive=G.seats.slice(),log=[],win="";
+    for(var d=1;d<=uptoDay;d++){
+      var victim=nightVictim(d,alive);
+      if(d===uptoDay&&stage==="night")return {alive:alive,log:log,win:win,victim:victim};
+      if(victim){alive=alive.filter(function(s){return s!==victim;});log.push({day:d,type:"night",seat:victim});}
+      else log.push({day:d,type:"night",seat:0});
+      win=judge(alive);
+      if(win||(d===uptoDay&&stage==="morning"))return {alive:alive,log:log,win:win,victim:victim};
+      var ex=exiles[d];
+      if(ex===undefined)return {alive:alive,log:log,win:win,victim:victim};
+      if(ex){alive=alive.filter(function(s){return s!==ex;});}
+      log.push({day:d,type:"vote",seat:ex||0});
+      win=judge(alive);
+      if(win||d===uptoDay)return {alive:alive,log:log,win:win,victim:victim};
+    }
+    return {alive:alive,log:log,win:win,victim:0};
+  }
+  function nightVictim(d,alive){
+    if(G.lockNight===d)return 0;
+    var pool=alive.filter(function(s){return !isThief(s);});
+    if(!pool.length)return 0;
+    return pick(rng("victim|"+d+"|"+alive.join(",")),pool);
+  }
+  function smellClue(d,alive){
+    var r=rng("smell|"+d+"|"+alive.join(",")),me=G.seats.filter(function(s){return G.role[s]==="smeller";})[0];
+    var thieves=alive.filter(isThief),t=pick(r,thieves),who=thieves.length>1?"도둑 중 한 명은":"도둑은";
+    var innocents=alive.filter(function(s){return !isThief(s)&&s!==me;});
+    var fake=G.fakeNight===d,type=pick(r,["parity","pair","notThief","neighbor"]);
+    var T=D.smell;
+    function fill(tpl,o){return tpl.replace(/\{(\w+)\}/g,function(_,k){return o[k];});}
+    if(fake){
+      if(innocents.length>=2){var two=shuffle(r,innocents).slice(0,2).sort(function(a,b){return a-b;});return fill(T.pair,{who:who,a:two[0],b:two[1]});}
+      return fill(T.notThief,{a:t});
+    }
+    if(type==="parity")return fill(T.parity,{who:who,p:t%2?"홀수":"짝수"});
+    if(type==="pair"&&innocents.length){var o=pick(r,innocents),pr=[t,o].sort(function(a,b){return a-b;});return fill(T.pair,{who:who,a:pr[0],b:pr[1]});}
+    if(type==="notThief"&&innocents.length)return fill(T.notThief,{a:pick(r,innocents)});
+    var nb=pick(r,[t===1?G.n:t-1,t===G.n?1:t+1]);
+    return fill(T.neighbor,{who:who,a:nb});
+  }
+
+  // ---------- 저장 ----------
+  function save(){try{localStorage.setItem("yasikMafia1",JSON.stringify(ST));}catch(e){}}
+  function load(){try{return JSON.parse(localStorage.getItem("yasikMafia1"));}catch(e){return null;}}
+
+  // ---------- 단계 ----------
+  // ST: {code, seat, phase, day, exiles:{}, revote, hist:[], checks:{}, fake:{}}
+  function phaseName(){
+    var p=ST.phase,d=ST.day;
+    return {role:"역할 확인",night:d+"일째 밤",morning:d+"일째 아침",talk:d+"일째 토론",vote:d+"일째 투표",end:"게임 끝"}[p];
+  }
+  function snapshot(){return JSON.stringify({phase:ST.phase,day:ST.day,exiles:ST.exiles,revote:ST.revote});}
+  function go(phase,day){
+    ST.hist.push(snapshot());if(ST.hist.length>40)ST.hist.shift();
+    ST.phase=phase;if(day)ST.day=day;
+    save();render(true);
+  }
+  function next(){
+    var p=ST.phase,d=ST.day;
+    if(p==="role")return go("night",1);
+    if(p==="night")return go("morning");
+    if(p==="morning"){var r=replay(ST.exiles,d,"morning");return r.win?go("end"):go("talk");}
+    if(p==="talk")return go("vote");
+    if(p==="end")return;
+  }
+  function vote(seat){ // seat 0 = 동점
+    if(!seat&&!ST.revote){ST.hist.push(snapshot());ST.revote=true;save();render(true);toast("재투표!");return;}
+    ST.hist.push(snapshot());
+    ST.exiles[ST.day]=seat||0;ST.revote=false;
+    var r=replay(ST.exiles,ST.day,"vote");
+    ST.phase=r.win?"end":"night";if(!r.win)ST.day++;
+    save();render(true);
+  }
+  function undo(){
+    var s=ST.hist.pop();if(!s)return;
+    var o=JSON.parse(s);ST.phase=o.phase;ST.day=o.day;ST.exiles=o.exiles;ST.revote=o.revote;
+    save();render(false);toast("되돌렸어요");
+  }
+
+  // ---------- 화면 ----------
+  function seatLabel(s){return s+"번";}
+  function foodText(s){var f=G.info[s].food;return f.name+" "+f.amount;}
+  function holdCard(){
+    var mine=G.role[ST.seat],thief=mine==="thief",extra="";
+    if(thief&&G.thieves.length>1)extra=" 동료 도둑: "+G.thieves.filter(function(s){return s!==ST.seat;}).map(seatLabel).join(", ")+".";
+    var mission={
+      thief:"밤마다 야식을 하나씩 먹어요. 낮에는 시치미 떼고, 남은 시민 수가 도둑 수와 같아지면 승리!",
+      detective:"밤마다 한 명을 골라 도둑인지 확인해요. 결과를 밝힐지는 당신이 정해요.",
+      smeller:"밤마다 도둑에 대한 냄새 단서를 하나 받아요. 가끔은 헷갈리는 단서일 수도 있어요.",
+      citizen:"특별한 능력은 없어요. 토론과 투표로 도둑을 모두 쫓아내면 승리!"
+    }[mine];
+    return '<div class="hold '+(thief?"thief":"town")+'" id="hold" role="button" tabindex="0" aria-label="누르고 있는 동안 내 역할 보기">'+
+      '<p class="cover">꾹 누르고 있는 동안만 보여요</p>'+
+      '<div class="reveal"><p class="role">'+RNAME[mine]+'</p><p class="mission">'+esc(mission+extra)+'</p></div></div>';
+  }
+  function bindHold(){
+    var h=$("hold");if(!h)return;
+    var show=function(v){h.classList.toggle("show",v);};
+    h.addEventListener("pointerdown",function(e){e.preventDefault();try{h.setPointerCapture(e.pointerId);}catch(x){}show(true);});
+    ["pointerup","pointercancel","lostpointercapture"].forEach(function(t){h.addEventListener(t,function(){show(false);});});
+    h.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();show(true);}});
+    h.addEventListener("keyup",function(){show(false);});
+    h.addEventListener("contextmenu",function(e){e.preventDefault();});
+  }
+  function rolesTable(alive){
+    return G.seats.map(function(s){
+      var dead=alive.indexOf(s)<0,rl=G.role[s];
+      return '<div class="seatline"><span class="'+(dead?"dead":"")+'">'+seatLabel(s)+" · "+esc(G.info[s].trait)+'</span><span class="tag '+RTAG[rl]+'">'+RNAME[rl]+"</span></div>";
+    }).join("");
+  }
+  function logList(log){
+    if(!log.length)return '<p class="sub">아직 아무 일도 없었어요.</p>';
+    return '<ul class="list">'+log.map(function(e){
+      if(e.type==="night")return "<li>"+e.day+"일째 밤: "+(e.seat?seatLabel(e.seat)+"의 "+esc(G.info[e.seat].food.name)+" 실종, "+seatLabel(e.seat)+" 탈락":"아무것도 사라지지 않음")+"</li>";
+      return "<li>"+e.day+"일째 투표: "+(e.seat?seatLabel(e.seat)+" 추방":"동점, 추방 없음")+"</li>";
+    }).join("")+"</ul>";
+  }
+
+  var isHost=function(){return ST&&ST.seat===1;};
+  function speak(text){
+    if(!isHost()||!ST.voice||!("speechSynthesis" in window))return;
+    try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang="ko-KR";u.rate=1;window.speechSynthesis.speak(u);}catch(e){}
+  }
+  function buzz(){try{if(navigator.vibrate)navigator.vibrate(120);}catch(e){}}
+  function toast(t){var el=document.createElement("div");el.className="toast";el.textContent=t;document.body.appendChild(el);setTimeout(function(){el.remove();},1400);}
+
+  function render(changed){
+    clearInterval(timerId);timerId=0;
+    if(!ST){renderLobby();return;}
+    $("status").hidden=false;$("dock").hidden=false;
+    $("sCode").textContent=G.code;$("sSeat").textContent=seatLabel(ST.seat)+(isHost()?" (방장)":"");
+    $("sPhase").textContent=phaseName();$("sPw").textContent=G.pw;
+    var p=ST.phase,d=ST.day,html="",say="";
+    var st=replay(ST.exiles,d,p==="night"?"night":p==="morning"||p==="talk"?"morning":"vote");
+    var meAlive=st.alive.indexOf(ST.seat)>=0;
+    var nextLabel="다음",nextHint=isHost()?"모두에게 \"다음!\"이라고 말한 뒤 누르세요.":"방장이 \"다음!\"이라고 하면 누르세요.";
+    $("next").disabled=false;$("next").hidden=false;
+
+    if(p==="role"){
+      html='<section class="card"><h2>'+esc(G.place.name)+'</h2><p class="say">'+esc(G.place.intro)+'</p>'+
+        '<p>나는 <b>'+seatLabel(ST.seat)+'</b>, '+esc(G.info[ST.seat].trait)+'. 내 야식은 <b>'+esc(foodText(ST.seat))+'</b>.</p></section>'+
+        '<section class="card"><h3>내 역할</h3>'+holdCard()+'</section>'+
+        (G.event?'<section class="card"><h3>이번 판 특별 사건: '+esc(G.event.name)+'</h3><p>'+esc(G.event.text)+'</p></section>':"")+
+        '<section class="card"><h3>모두의 자리</h3>'+G.seats.map(function(s){return '<div class="seatline"><span>'+seatLabel(s)+" · "+esc(G.info[s].trait)+'</span><span class="sub">'+esc(G.info[s].food.name)+"</span></div>";}).join("")+'</section>';
+      nextLabel="첫날 밤으로";
+      say=G.place.intro+" 모두 역할을 확인하세요.";
+    }
+
+    else if(p==="night"){
+      say=d+"일째 밤이 되었습니다. 모두 자기 휴대폰만 보세요.";
+      if(!meAlive){html=specCard(st.alive,st.log);}
+      else{
+        var mine=G.role[ST.seat],body="";
+        if(mine==="thief"){
+          if(st.victim)body='<p class="big">오늘 밤 당신은 <span class="hl">'+seatLabel(st.victim)+'</span>의 <span class="hl">'+esc(foodText(st.victim))+'</span>'+(batchim(G.info[st.victim].food.amount)?"을":"를")+' 먹었다.</p><p class="sub">'+seatLabel(st.victim)+'은 아침에 탈락해요. 들키지 않게 표정 관리!</p>';
+          else body='<p class="big">냉장고가 잠겨 있다. 오늘 밤은 굶었다.</p>';
+        }else if(mine==="detective"){
+          if(G.event&&G.event.id==="blackout"&&d===1)body='<p class="big">정전이라 아무것도 안 보인다.</p><p class="sub">오늘 밤은 조사할 수 없어요. 그래도 화면을 보고 있는 척 해 주세요.</p>';
+          else{
+            var done=ST.checks[d];
+            body='<p>도둑인지 확인할 사람을 한 명 고르세요.</p><div class="grid">'+st.alive.filter(function(s){return s!==ST.seat;}).map(function(s){
+              return '<button type="button" class="btn" id="chk'+s+'" data-chk="'+s+'"'+(done?" disabled":"")+(done===s?' aria-pressed="true"':"")+">"+s+"</button>";}).join("")+"</div>"+
+              (done?'<p class="big">'+seatLabel(done)+'은 <span class="hl">'+(isThief(done)?"야식 도둑이다!":"도둑이 아니다.")+"</span></p>":"");
+          }
+          body+=pastChecks();
+        }else if(mine==="smeller"){
+          body='<p class="sub">킁킁… 어디선가 냄새가 난다.</p><p class="big">'+esc(smellClue(d,st.alive))+'</p>'+(G.event&&G.event.id==="misdelivery"?'<p class="sub">이번 판엔 가짜 단서가 하나 섞여 있어요.</p>':"");
+        }else{
+          var fa=ST.fake[d];
+          body='<p>오늘 밤 할 일을 하나 고르세요.</p><div class="row">'+D.fakeActions.map(function(a,ix){
+            return '<button type="button" class="btn grow" id="fake'+ix+'" data-fake="'+ix+'"'+(fa!==undefined?" disabled":"")+">"+esc(a.button)+"</button>";}).join("")+"</div>"+
+            (fa!==undefined?'<p class="big">'+esc(D.fakeActions[fa].result)+"</p>":"");
+        }
+        html='<section class="card"><h2>'+d+'일째 밤</h2><p class="sub">다른 사람 화면을 보지 마세요. 모두 자기 폰에서 뭔가를 누르고 있어요.</p>'+body+'</section>'+
+          '<section class="card"><h3>내 역할 다시 보기</h3>'+holdCard()+'</section>';
+      }
+      nextLabel="아침으로";
+    }
+
+    else if(p==="morning"){
+      var v=st.victim;
+      var msg=v?seatLabel(v)+"의 "+foodText(v)+(batchim(G.info[v].food.amount)?"이":"가")+" 사라졌다. "+seatLabel(v)+"은 배가 고파 탈락!":"간밤에는 아무것도 사라지지 않았다.";
+      say=d+"일째 아침이 밝았습니다. "+msg;
+      html='<section class="card"><h2>'+d+'일째 아침</h2><p class="big">'+(v?'<span class="hl">'+seatLabel(v)+'</span>의 <span class="hl">'+esc(foodText(v))+"</span>"+(batchim(G.info[v].food.amount)?"이":"가")+' 사라졌다.</p><p class="out">'+seatLabel(v)+" ("+esc(G.info[v].trait)+")은 배가 고파 탈락.</p>":"간밤에는 아무것도 사라지지 않았다.</p>")+
+        (G.lockNight===d?'<p class="sub">냉장고 잠금 덕분이에요.</p>':"")+
+        '<p class="sub">남은 사람: '+st.alive.map(seatLabel).join(", ")+"</p></section>"+
+        (meAlive?"":specCard(st.alive,st.log))+
+        '<section class="card"><h3>지금까지</h3>'+logList(st.log)+"</section>";
+      if(st.win)nextLabel="결과 보기";else nextLabel="토론 시작 (1분)";
+    }
+
+    else if(p==="talk"){
+      say="토론을 시작합니다. 1분입니다.";
+      html='<section class="card"><h2>'+d+'일째 토론</h2><p class="timer" id="timer">'+TALK+'</p><p class="sub" style="text-align:center">누가 야식을 먹었을까요? 탈락한 사람은 말하지 않아요.</p></section>'+
+        (meAlive?'<section class="card"><h3>내 역할 다시 보기</h3>'+holdCard()+"</section>":specCard(st.alive,st.log))+
+        '<section class="card"><h3>지금까지</h3>'+logList(st.log)+"</section>";
+      nextLabel="투표하기";
+    }
+
+    else if(p==="vote"){
+      say=ST.revote?"동점입니다. 동점인 사람만 놓고 다시 지목하세요.":"투표 시간입니다. 하나, 둘, 셋에 동시에 가리키세요.";
+      html='<section class="card"><h2>'+d+'일째 투표'+(ST.revote?" · 재투표":"")+'</h2>'+
+        '<p>"하나 둘 셋"에 살아 있는 사람이 동시에 손가락으로 가리켜요. 가장 많이 지목된 사람을 모두 똑같이 누르세요.</p>'+
+        (ST.revote?'<p class="out">재투표예요. 또 동점이면 이번 투표는 추방 없이 넘어가요.</p>':"")+
+        '<div class="grid">'+st.alive.map(function(s){return '<button type="button" class="btn" id="v'+s+'" data-vote="'+s+'">'+s+"<small>"+esc(G.info[s].food.name)+"</small></button>";}).join("")+
+        '</div><button type="button" class="btn" id="vtie" data-vote="0">동점</button></section>'+
+        (meAlive?"":specCard(st.alive,st.log));
+      $("next").hidden=true;nextHint="모두 같은 번호를 눌러야 다음 밤이 똑같이 계산돼요.";
+    }
+
+    else if(p==="end"){
+      var w=st.win;
+      say=w==="town"?"시민 팀 승리! 야식 도둑을 모두 잡았습니다.":"야식 도둑 승리! 냉장고는 이제 도둑의 것입니다.";
+      html='<section class="card"><p class="winner '+(w==="town"?"c":"t")+'">'+(w==="town"?"시민 팀 승리!":"야식 도둑 승리!")+'</p>'+
+        '<p style="text-align:center">'+(w==="town"?"야식 도둑을 모두 잡았어요.":"남은 시민 수가 도둑 수와 같아졌어요.")+"</p></section>"+
+        '<section class="card"><h3>모든 역할</h3>'+rolesTable(st.alive)+'</section><section class="card"><h3>이번 판 기록</h3>'+logList(st.log)+"</section>"+
+        '<section class="card"><p>같은 사람끼리 한 판 더 하려면 방장이 새 방 번호를 만들어요.</p></section>';
+      $("next").hidden=true;nextHint="";
+    }
+
+    app.innerHTML=html;
+    $("next").textContent=nextLabel;$("nextHint").textContent=nextHint;
+    $("undo").hidden=!ST.hist.length;
+    bindHold();
+    if(changed){buzz();speak(say);window.scrollTo(0,0);}
+    if(p==="talk")startTimer();
+  }
+  function pastChecks(){
+    var days=Object.keys(ST.checks).filter(function(k){return +k<ST.day;});
+    if(!days.length)return "";
+    return '<h3>지난 조사</h3><ul class="list">'+days.map(function(k){var s=ST.checks[k];return "<li>"+k+"일째: "+seatLabel(s)+" → "+(isThief(s)?"도둑":"도둑 아님")+"</li>";}).join("")+"</ul>";
+  }
+  function specCard(alive,log){
+    return '<section class="card"><h2>탈락했어요</h2><p class="sub">이제부터 모든 역할을 볼 수 있어요. 남은 사람들에게 알려주면 안 돼요. 방장이 "다음!" 하면 같이 눌러 주세요.</p>'+rolesTable(alive)+"</section>";
+  }
+  function startTimer(){
+    var end=Date.now()+TALK*1000,el=$("timer"),fired=false;
+    function tick(){
+      var left=Math.max(0,Math.ceil((end-Date.now())/1000));
+      if(el){el.textContent=left;el.classList.toggle("low",left<=10);}
+      if(left===0&&!fired){fired=true;clearInterval(timerId);buzz();speak("시간이 다 됐습니다. 투표하세요.");}
+    }
+    tick();timerId=setInterval(tick,250);
+  }
+
+  app.addEventListener("click",function(e){
+    var b=e.target.closest("button");if(!b||!ST)return;
+    if(b.hasAttribute("data-chk")){ST.checks[ST.day]=+b.getAttribute("data-chk");save();render(false);return;}
+    if(b.hasAttribute("data-fake")){ST.fake[ST.day]=+b.getAttribute("data-fake");save();render(false);return;}
+    if(b.hasAttribute("data-vote")){vote(+b.getAttribute("data-vote"));return;}
+  });
+  $("next").addEventListener("click",next);
+  $("undo").addEventListener("click",undo);
+  $("quit").addEventListener("click",function(){
+    if(!$("quit").dataset.armed){$("quit").dataset.armed="1";$("quit").textContent="한 번 더 누르면 나가요";setTimeout(function(){$("quit").dataset.armed="";$("quit").textContent="방 나가기";},2500);return;}
+    $("quit").dataset.armed="";$("quit").textContent="방 나가기";
+    ST=null;G=null;try{localStorage.removeItem("yasikMafia1");}catch(e){}
+    $("status").hidden=true;$("dock").hidden=true;renderLobby();
+  });
+
+  // ---------- 입장 화면 ----------
+  var lobby={n:6,code:"",seat:0};
+  function renderLobby(){
+    clearInterval(timerId);
+    var p=parseCode(lobby.code),seatBtns="";
+    if(p)for(var i=1;i<=p.n;i++)seatBtns+='<button type="button" class="btn" id="seat'+i+'" data-seat="'+i+'" aria-pressed="'+(lobby.seat===i)+'">'+i+(i===1?"<small>방장</small>":"")+"</button>";
+    var nBtns="";for(var k=4;k<=8;k++)nBtns+='<button type="button" class="btn" id="n'+k+'" data-n="'+k+'" aria-pressed="'+(lobby.n===k)+'">'+k+"명</button>";
+    var pw=p?(buildGame(p.code),G.pw):"";
+    app.innerHTML='<h1>야식 도둑 <span>마피아</span></h1><p class="sub">4~8명이 각자 폰으로 하는 마피아 게임. 사회자는 폰이 대신해요.</p>'+
+      '<section class="card"><h3>방장이라면: 방 만들기</h3><p class="sub">인원 수를 고르면 방 번호가 생겨요. 다른 사람들에게 불러 주세요.</p>'+
+      '<div class="grid" style="grid-template-columns:repeat(5,1fr)">'+nBtns+'</div><button type="button" class="btn" id="make">'+lobby.n+'명 방 번호 만들기</button></section>'+
+      '<section class="card"><h3>방 번호</h3><input class="code" id="code" inputmode="numeric" autocomplete="off" placeholder="6-1234" aria-label="방 번호" value="'+esc(lobby.code)+'">'+
+      (p?'<p class="sub">확인 암호: <b style="color:var(--amber)">'+esc(pw)+'</b> · 모두 같은지 소리 내어 맞춰 보세요.</p>':'<p class="sub">예: 6-1234 (앞 숫자가 인원 수)</p>')+'</section>'+
+      (p?'<section class="card"><h3>내 자리 번호</h3><p class="sub">방장이 1번, 시계 방향으로 2번, 3번… 앉은 순서대로 정해요.</p><div class="grid">'+seatBtns+"</div></section>":"")+
+      '<button type="button" class="btn main" id="enter"'+(p&&lobby.seat?"":" disabled")+'>입장하기</button>'+
+      '<section class="card"><h3>규칙 요약</h3><ul class="list">'+
+      "<li>역할: 야식 도둑, 탐정, 냄새쟁이(5명 이상), 시민</li>"+
+      "<li>밤에는 모두 동시에 자기 폰만 봐요. 눈을 감지 않아요.</li>"+
+      "<li>야식을 도둑맞은 사람은 탈락해요. 도둑의 먹잇감은 폰이 정해요.</li>"+
+      "<li>토론 1분 뒤 동시에 지목하고, 가장 많이 지목된 사람을 모두 똑같이 눌러요. 동점이면 재투표 1번, 또 동점이면 추방 없음.</li>"+
+      "<li>도둑을 모두 쫓아내면 시민 팀 승리, 남은 시민 수가 도둑 수와 같아지면 도둑 승리.</li>"+
+      "<li>진행은 방장이 \"다음!\"을 외치면 모두 다음 버튼을 눌러요.</li></ul></section>";
+    if(!p)G=null;
+  }
+  app.addEventListener("input",function(e){
+    if(ST||e.target.id!=="code")return;
+    var v=e.target.value.replace(/[^\d-]/g,"");
+    if(/^\d{5}$/.test(v))v=v.charAt(0)+"-"+v.slice(1);
+    var was=!!parseCode(lobby.code);lobby.code=v;lobby.seat=0;
+    if(!!parseCode(v)!==was||parseCode(v)){renderLobby();var c=$("code");if(c){c.focus();c.setSelectionRange(c.value.length,c.value.length);}}
+    else e.target.value=v;
+  });
+  app.addEventListener("click",function(e){
+    if(ST)return;
+    var b=e.target.closest("button");if(!b)return;
+    if(b.hasAttribute("data-n")){lobby.n=+b.getAttribute("data-n");renderLobby();return;}
+    if(b.id==="make"){lobby.code=lobby.n+"-"+String(1000+Math.floor(Math.random()*9000));lobby.seat=1;renderLobby();return;}
+    if(b.hasAttribute("data-seat")){lobby.seat=+b.getAttribute("data-seat");renderLobby();return;}
+    if(b.id==="enter"){
+      var p=parseCode(lobby.code);if(!p||!lobby.seat)return;
+      buildGame(p.code);
+      ST={code:p.code,seat:lobby.seat,phase:"role",day:1,exiles:{},revote:false,hist:[],checks:{},fake:{},voice:true};
+      save();render(true);
+    }
+  });
+
+  // ---------- 시작 ----------
+  function boot(data){
+    D=data;
+    var saved=load();
+    if(saved&&parseCode(saved.code)){ST=saved;buildGame(ST.code);render(false);}
+    else renderLobby();
+  }
+  var fb=JSON.parse($("fallback").textContent);
+  if(location.protocol.indexOf("http")===0&&window.fetch){
+    fetch("scenarios.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(boot).catch(function(){boot(fb);});
+  }else boot(fb);
+
+  window.__mafia={buildGame:function(c,d){D=d||D||fb;return buildGame(c);},replay:function(ex,day,stage){return replay(ex,day,stage);},smellClue:function(d,a){return smellClue(d,a);},judge:judge,nightVictim:function(d,a){return nightVictim(d,a);}};
+})();
+</script>
+</body>
+</html>
