@@ -143,6 +143,22 @@ function enterRoom(c) {
 function roomObj() { return { meta: S.meta, players: S.players || {}, public: S.pub || {}, votes: S.votes || {}, secret: S.secretAll || {}, actions: S.actions || {}, "private": S.privateAll || {} }; }
 const amHost = () => S.meta && S.meta.host === uid;
 
+// 방 나가기. 대기실에서는 자리를 비우고, 게임 중에는 나간 사람을 탈락 처리해서 남은 사람들의 진행이 멈추지 않게 한다.
+async function leaveRoom() {
+  if (!code || !S.meta) return;
+  const me = roomPath("players/" + uid);
+  try {
+    if (S.meta.status === "lobby") await remove(ref(db, me));
+    else await update(ref(db, me), { alive: false, online: false, left: true });
+  } catch (e) { console.warn("leave", e); }
+  save("mafiaRoom", ""); cleanup(); renderHome("");
+}
+$("sLeave").addEventListener("click", () => {
+  if (!S.meta) return;
+  const msg = S.meta.status === "lobby" ? "방에서 나갈까요?" : "게임 중에 나가면 탈락 처리돼요. 나갈까요?";
+  if (confirm(msg)) leaveRoom();
+});
+
 // ---------- 심판 (방장 폰) ----------
 async function referee() {
   if (!S.meta || !S.players || busy) return;
@@ -245,7 +261,7 @@ function seatsTable(withRole) {
   const p = S.players || {};
   return Object.keys(p).filter((u) => p[u].seat).sort((a, b) => p[a].seat - p[b].seat).map((u) => {
     const s = p[u].seat, dead = p[u].alive === false, r = roles && roles[s];
-    return '<div class="seatline"><span class="' + (dead ? "dead" : "") + '">' + s + "번 " + esc(p[u].name) + ' <span class="sub">· ' + esc(info(s).trait || "") + "</span></span>" + (r ? '<span class="tag ' + RTAG[r] + '">' + C.RNAME[r] + "</span>" : '<span class="sub">' + esc(info(s).food || "") + "</span>") + "</div>";
+    return '<div class="seatline"><span class="' + (dead ? "dead" : "") + '">' + s + "번 " + esc(p[u].name) + (p[u].left ? ' <span class="sub">(나감)</span>' : "") + ' <span class="sub">· ' + esc(info(s).trait || "") + "</span></span>" + (r ? '<span class="tag ' + RTAG[r] + '">' + C.RNAME[r] + "</span>" : '<span class="sub">' + esc(info(s).food || "") + "</span>") + "</div>";
   }).join("");
 }
 function rolesFromSpect() { const o = {}, sp = S.spect || {}; Object.keys(sp).forEach((u) => { const s = P(u).seat; if (s) o[s] = sp[u].role; }); return o; }
@@ -398,8 +414,7 @@ app.addEventListener("click", async (e) => {
   if (b.id === "close") { if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "한 번 더 누르면 방이 사라져요"; return; } await remove(ref(db, roomPath())); return; }
   if (b.id === "leave") {
     if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "한 번 더 누르면 나가요"; return; }
-    if (S.meta.status === "lobby") await remove(ref(db, roomPath("players/" + uid))).catch(() => {});
-    save("mafiaRoom", ""); cleanup(); return renderHome("");
+    return leaveRoom();
   }
   const pk = C.phaseKey(S.meta);
   if (b.dataset.pick) { picks[pk] = +b.dataset.pick; render(); await set(ref(db, roomPath("actions/" + d + "/" + uid)), { target: picks[pk] }); await setReady(); return; }
